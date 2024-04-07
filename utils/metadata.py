@@ -17,7 +17,7 @@ def format_summary(sum: str):
     rsum = sum.split(". ")
     res_string = ""
     for i in range(0, 3):
-        res_string += rsum[i]
+        res_string += rsum[i] + ". "
     return res_string
 
 

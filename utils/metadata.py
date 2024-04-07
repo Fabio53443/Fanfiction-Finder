@@ -18,6 +18,8 @@ def format_summary(sum: str):
     res_string = ""
     for i in range(0, 3):
         res_string += rsum[i] + ". "
+    if len(res_string) < len(sum):
+        res_string += "..."
     return res_string
 
 
@@ -232,7 +234,7 @@ def fichub_metadata(query):
 
     embed.add_field(
         name='Summary',
-        value=format_summary(summary) + "...", inline=False)
+        value=format_summary(summary), inline=False)
 
     embed.add_field(
         name='📖 Length',

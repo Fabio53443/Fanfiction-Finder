@@ -119,8 +119,6 @@ def ao3_metadata(query: str):
                         name=':arrow_down: Download',
                         value= " | ".join(parsed_download_data), inline=True)
 
-            embed.add_field(name="\u200b",  # zero-width whitespace character
-                            value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
 
             embed.set_author(
                 name=fic.ao3_author_name, url=fic.ao3_author_url,
@@ -143,8 +141,11 @@ def ao3_metadata(query: str):
             embed = Embed(
                 title=fic.ao3_series_name,
                 url=fic.BaseUrl,
-                description=fic.ao3_series_summary,
+                description=fic.ao3_works_fandom,
                 colour=Colour(0x272b28))
+            embed.add_field(
+                name='Summary',
+                value=format_summary(fic.ao3_works_summary) + "...", inline=False)
 
             if fic.ao3_series_status == "Completed":
 
@@ -168,9 +169,6 @@ def ao3_metadata(query: str):
                 name='📖 Length',
                 value=fic.ao3_series_length +
                 " words in "+fic.ao3_series_works+" work(s)", inline=True)
-
-            embed.add_field(name="\u200b",  # zero-width whitespace character
-                            value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
 
             embed.set_author(
                 name=fic.ao3_author_name, url=fic.ao3_author_url,
@@ -234,7 +232,7 @@ def fichub_metadata(query):
 
     embed.add_field(
         name='Summary',
-        value=summary[:700] + "...", inline=False)
+        value=format_summary(summary) + "...", inline=False)
 
     embed.add_field(
         name='📖 Length',
@@ -291,8 +289,6 @@ def fichub_metadata(query):
                 name=':arrow_down: Download',
                 value= " | ".join(parsed_download_data), inline=False)
 
-    embed.add_field(name="\u200b",  # zero-width whitespace character
-                    value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from Fichub.net API. Data can be stale!*", inline=False)
 
     embed.set_author(
         name=fic.response['meta']['author'],

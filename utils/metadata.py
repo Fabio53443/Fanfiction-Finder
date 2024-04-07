@@ -19,7 +19,7 @@ def format_summary(sum: str):
     for i in range(0, 3):
         res_string += rsum[i] + ". "
     if len(res_string) < len(sum):
-        res_string[-1] = "..."
+        res_string += "..."
     return res_string
 
 

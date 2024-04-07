@@ -16,7 +16,7 @@ URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[0
 def format_summary(sum: str):
     res_string = ""
     for i in range(0, 3):
-        res_string += rsum[i] + ". "
+        res_string += sum[i] + ". "
     if len(res_string) < len(sum):
         res_string += "..."
     return res_string
@@ -146,7 +146,7 @@ def ao3_metadata(query: str):
                 colour=Colour(0x272b28))
             embed.add_field(
                 name='Summary',
-                value=format_summary(fic.ao3_works_summary) + , inline=False)
+                value=format_summary(fic.ao3_works_summary), inline=False)
 
             if fic.ao3_series_status == "Completed":
 

@@ -53,11 +53,14 @@ def ao3_metadata(query: str):
             embed = Embed(
                 title=fic.ao3_works_name,
                 url=fic.BaseUrl,
-                description=fic.ao3_works_summary,
+                description=fic.ao3_works_fandom,
                 colour=Colour(0x272b28))
+            
+            embed.add_field(
+                name='Summary',
+                value=fic.ao3_works_summary[:450] + "...", inline=False)
 
             if fic.ao3_works_status == "Completed":
-
                 embed.add_field(
                     name='📜 Last Updated',
                     value=fic.ao3_works_last_up +
@@ -79,20 +82,22 @@ def ao3_metadata(query: str):
                 value=fic.ao3_works_length +
                 " words in "+fic.ao3_works_chapters+" chapter(s)", inline=True)
 
-            other_info = [fic.ao3_works_fandom, "  ☘︎  "]
+            other_info = []
 
             for var in [fic.ao3_works_relationships, fic.ao3_works_characters]:
                 if var is not None:
                     other_info.append(str(var))
-                    other_info.append("  ☘︎  ")
+                    other_info.append("  |  ")
 
             other_info = ''.join(other_info[:len(other_info)-1])
             if len(list(other_info)) > 100:
-                other_info = other_info[:100] + "..."
+                other_info = other_info[:230] + "..."
+
+            embed.add_field(name=f":bookmark: Rating",
+                            value=fic.ao3_works_rating, inline=True)
 
             if other_info:
-                embed.add_field(name=f":bookmark: Rating: {fic.ao3_works_rating}",
-                                value=other_info, inline=False)
+                embed.add_field(name=":hash: Tags", value=other_info, inline=False)
 
             if fic.ao3_works_metainfo:
                 embed.add_field(name="📊 Stats",
@@ -102,18 +107,18 @@ def ao3_metadata(query: str):
             for file_format, download_url in fic.files.items():
                 formatted_data = f"[{file_format}]({download_url})"
                 parsed_download_data.append(formatted_data)
-            
+
             embed.add_field(
                         name=':arrow_down: Download',
-                        value= " ☘︎ ".join(parsed_download_data), inline=True)
+                        value= " | ".join(parsed_download_data), inline=True)
 
             embed.add_field(name="\u200b",  # zero-width whitespace character
                             value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
-            
+
             embed.set_author(
                 name=fic.ao3_author_name, url=fic.ao3_author_url,
                 icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
-                
+
         elif re.search(r"/series/\b", ao3_url) is not None:
 
             # extract series id from the url
@@ -159,7 +164,7 @@ def ao3_metadata(query: str):
 
             embed.add_field(name="\u200b",  # zero-width whitespace character
                             value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
-            
+
             embed.set_author(
                 name=fic.ao3_author_name, url=fic.ao3_author_url,
                 icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
@@ -168,10 +173,6 @@ def ao3_metadata(query: str):
             embed = Embed(
                 description="Fanfiction not found",
                 colour=Colour.red())
-
-        if fic.ao3_author_img:
-            embed.set_thumbnail(
-                url=fic.ao3_author_img)
 
         return embed
     except Exception as err:
@@ -216,46 +217,53 @@ def fichub_metadata(query):
         return Embed(description="Fanfiction not found",
                      colour=Colour.red())
 
+    summary = fic.response['meta']['description'].replace("<p>","").replace("</p>","").replace("<hr />","\n\n")
+    fichub_fandom = fic.response['meta']['rawExtendedMeta']['raw_fandom'] if 'raw_fandom' in fic.response['meta']['rawExtendedMeta'] else ""
     embed = Embed(
         title=fic.response['meta']['title'],
         url=fic.response['meta']['source'],
-        description=fic.response['meta']['description']
-        .replace("<p>","").replace("</p>","").replace("<hr />","\n\n"),
+        description= fichub_fandom,
         colour=Colour(0x272b28))
-    
+
+    embed.add_field(
+        name='Summary',
+        value=summary[:700] + "...", inline=False)
+
     embed.add_field(
         name='📖 Length',
         value="{:,}".format(int(str(fic.response['meta']['words']))) +
         " words in "+"{:,}".format(int(fic.response['meta']['chapters']))+" chapter(s)",inline=True)
-    
+
     if fic.response['meta']['rawExtendedMeta']:
         fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
         embed.add_field(
             name='📜 Last Updated',
             value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
-        other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'] if 'raw_fandom' in fic.response['meta']['rawExtendedMeta'] else "", "  ☘︎  "]
+        other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'] if 'raw_fandom' in fic.response['meta']['rawExtendedMeta'] else "", "  |  "]
 
         for var in [fic.response['meta']['rawExtendedMeta']['genres'] if 'genres' in fic.response['meta']['rawExtendedMeta'] else "",
                     fic.response['meta']['rawExtendedMeta']['characters']  if 'characters' in fic.response['meta']['rawExtendedMeta'] else ""]:
             if var is not None:
                 other_info.append(str(var))
-                other_info.append("  ☘︎  ")
+                other_info.append("  |  ")
 
         other_info = ''.join(other_info[:len(other_info)-1])
 
         if len(list(other_info)) > 100:
             other_info = other_info[:100] + "..."
 
-        if other_info and "rated" in fic.response['meta']['rawExtendedMeta']:
-            embed.add_field(name=f":bookmark: Rating: {fic.response['meta']['rawExtendedMeta']['rated']}",
-                            value=other_info, inline=False)
-    
+        if "rated" in fic.response['meta']['rawExtendedMeta']:
+            embed.add_field(name=f":bookmark: Rating",
+                            value=fic.response['meta']['rawExtendedMeta']['rated'], inline=True)
+        if other_info:
+            embed.add_field(name=":hash: Tags", value=other_info, inline=False)
+
         fic_stats_fields = ['reviews', 'favorites', 'follows']
         fic_stats = ""
         for fic_stat in fic_stats_fields:
             if fic_stat in fic.response['meta']['rawExtendedMeta']:
-                fic_stats += f"**{fic_stat.capitalize()}** {fic.response['meta']['rawExtendedMeta'][fic_stat]}  ☘︎  "
+                fic_stats += f"**{fic_stat.capitalize()}** {fic.response['meta']['rawExtendedMeta'][fic_stat]}  |  "
 
         embed.add_field(name="📊 Stats",
                         value=fic_stats, inline=False)
@@ -271,11 +279,11 @@ def fichub_metadata(query):
         download_url = file_data['download_url']
         formatted_data = f"[{file_format}]({download_url})"
         parsed_download_data.append(formatted_data)
-    
+
     embed.add_field(
                 name=':arrow_down: Download',
-                value= " ☘︎ ".join(parsed_download_data), inline=False)
-    
+                value= " | ".join(parsed_download_data), inline=False)
+
     embed.add_field(name="\u200b",  # zero-width whitespace character
                     value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from Fichub.net API. Data can be stale!*", inline=False)
 
@@ -286,4 +294,4 @@ def fichub_metadata(query):
     )
     return embed
 
-    
+

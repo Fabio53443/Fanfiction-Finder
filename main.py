@@ -126,6 +126,7 @@ class FicFinder(commands.Bot):
                                 await message.reply(
                                     embed=embed_pg, mention_author=False
                                 )
+                                await message.edit(suppress=True)
                             except Exception as err:
                                 logger.error(err)
                                 await message.channel.send(embed=embed_pg)
@@ -144,6 +145,7 @@ class FicFinder(commands.Bot):
                                 await message.reply(
                                     embed=embed_pg, mention_author=False
                                 )
+                                await message.edit(suppress=True)                                 
                             except Exception as err:
                                 logger.error(err)
                                 await message.channel.send(embed=embed_pg)
